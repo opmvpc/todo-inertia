@@ -33,6 +33,6 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
-});
 
-Route::resource('tasks', TaskController::class)->middleware(['auth']);
+    Route::resource('tasks', TaskController::class)->only(['index', 'store', 'update', 'destroy']);
+});
