@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskRequest;
 use App\Models\Task;
+use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class TaskController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(HandlePrecognitiveRequests::class)->only('store');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -29,11 +36,9 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreTaskRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'min:2', 'max:255'],
-        ]);
+        $validated = $request->validated();
 
         Auth::user()->tasks()->create([
             'name' => $validated['name'],

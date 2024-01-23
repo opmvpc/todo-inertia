@@ -10,24 +10,20 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import SectionTitle from "@/Components/SectionTitle.vue";
 import TextInput from "@/Components/TextInput.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import { useForm as usePrecognitionForm } from "laravel-precognition-vue-inertia";
 import { useForm } from "@inertiajs/vue3";
 import { ref } from "vue";
 
 const props = defineProps(["tasks"]);
 
-const formCreateTask = useForm({
-    _method: "POST",
+const formCreateTask = usePrecognitionForm("post", route("tasks.store"), {
     name: "",
 });
 
-const formUpdateTask = useForm({
-    _method: "PUT",
-    is_done: false,
-});
+formCreateTask.setValidationTimeout(300);
 
 const createTask = () => {
-    formCreateTask.post(route("tasks.store"), {
-        errorBag: "createTask",
+    formCreateTask.submit({
         preserveScroll: true,
         onSuccess: () => {
             formCreateTask.name = "";
@@ -35,10 +31,14 @@ const createTask = () => {
     });
 };
 
+const formUpdateTask = useForm("put", {
+    is_done: false,
+});
+
 const updateTask = (id, isDone) => {
     formUpdateTask.is_done = isDone;
-    formUpdateTask.post(route("tasks.update", id), {
-        errorBag: "updateTask",
+    formUpdateTask.put(route("tasks.update", id), {
+        url: route("tasks.update", id),
         preserveScroll: true,
         onSuccess: () => {
             //
@@ -48,9 +48,7 @@ const updateTask = (id, isDone) => {
 
 const confirmingTaskDeletion = ref(false);
 const taskIdToDelete = ref(null);
-const formDeleteTask = useForm({
-    _method: "DELETE",
-});
+const formDeleteTask = useForm("delete", {});
 
 const confirmTaskDeletion = (id) => {
     taskIdToDelete.value = id;
@@ -59,7 +57,6 @@ const confirmTaskDeletion = (id) => {
 
 const deleteTask = () => {
     formDeleteTask.delete(route("tasks.destroy", taskIdToDelete.value), {
-        errorBag: "deleteTask",
         preserveScroll: true,
         onSuccess: () => {
             confirmingTaskDeletion.value = false;
@@ -97,8 +94,7 @@ const closeModal = () => {
                             v-model="formCreateTask.name"
                             type="text"
                             class="mt-1 block w-full"
-                            required
-                            autocomplete="name"
+                            @input="formCreateTask.validate('name')"
                         />
                         <InputError
                             :message="formCreateTask.errors.name"
@@ -124,7 +120,7 @@ const closeModal = () => {
                 </template>
             </FormSection>
 
-            <div class="md:grid md:grid-cols-3 md:gap-6 space-y-4 sm:space-y-0">
+            <div class="md:grid md:grid-cols-3 md:gap-6 space-y-4 md:space-y-0">
                 <SectionTitle>
                     <template #title> Mes tâches </template>
                     <template #description>
