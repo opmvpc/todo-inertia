@@ -20,12 +20,14 @@ const formCreateTask = usePrecognitionForm("post", route("tasks.store"), {
     name: "",
 });
 
+// Attends 300ms avant de valider le champ pour éviter de spammer le serveur
 formCreateTask.setValidationTimeout(300);
 
 const createTask = () => {
     formCreateTask.submit({
         preserveScroll: true,
         onSuccess: () => {
+            // On vide le champ après avoir créé la tâche
             formCreateTask.name = "";
         },
     });
@@ -38,7 +40,6 @@ const formUpdateTask = useForm("put", {
 const updateTask = (id, isDone) => {
     formUpdateTask.is_done = isDone;
     formUpdateTask.put(route("tasks.update", id), {
-        url: route("tasks.update", id),
         preserveScroll: true,
         onSuccess: () => {
             //
