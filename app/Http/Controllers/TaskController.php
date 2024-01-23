@@ -44,6 +44,8 @@ class TaskController extends Controller
             'name' => $validated['name'],
         ]);
 
+        $request->session()->flash('flash.banner', 'La tâche a bien été créée.');
+
         return redirect()->back();
     }
 
@@ -68,6 +70,10 @@ class TaskController extends Controller
 
         $task->update($validated);
 
+        $message = $validated['is_done'] ? 'La tâche a bien été marquée comme terminée.' : 'La tâche a bien été marquée comme non terminée.';
+
+        $request->session()->flash('flash.banner', $message);
+
         return redirect()->back();
     }
 
@@ -77,6 +83,8 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $task->delete();
+
+        session()->flash('flash.banner', 'La tâche a bien été supprimée.');
 
         return redirect()->back();
     }
