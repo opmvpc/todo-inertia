@@ -64,6 +64,8 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
+        $this->authorize('update', $task);
+
         $validated = $request->validate([
             'is_done' => ['required', 'boolean'],
         ]);
@@ -82,6 +84,8 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
+        $this->authorize('delete', $task);
+
         $task->delete();
 
         session()->flash('flash.banner', 'La tâche a bien été supprimée.');
